@@ -1,5 +1,7 @@
 import { inject } from '@adonisjs/core'
+import type { Infer } from '@vinejs/vine/types'
 import type Comentario from '#models/comentario'
+import type { crearComentarioValidator } from '#validators/comentario'
 import { ComentarioRepository } from '#repositories/comentario_repository'
 import AccionNoPermitidaException from '#exceptions/accion_no_permitida_exception'
 import RecursoNoEncontradoException from '#exceptions/recurso_no_encontrado_exception'
@@ -10,12 +12,7 @@ import RecursoNoEncontradoException from '#exceptions/recurso_no_encontrado_exce
  */
 const CLAVE_MODERACION = 'dev-secret-cambiar'
 
-export type NuevoComentario = {
-  autor_nombre: string
-  autor_email: string
-  cuerpo: string
-  padre_id?: number | null
-}
+export type NuevoComentario = Infer<typeof crearComentarioValidator>
 
 export type CredencialesDeComentario = {
   autorEmail?: string | null
@@ -61,7 +58,9 @@ export class ComentarioService {
     const esModerador = credenciales.claveModeracion === CLAVE_MODERACION
     const esAutor =
       String(comentario.autorEmail).toLowerCase().trim() ===
-      String(credenciales.autorEmail ?? '').toLowerCase().trim()
+      String(credenciales.autorEmail ?? '')
+        .toLowerCase()
+        .trim()
     if (!esModerador && !esAutor) {
       throw new AccionNoPermitidaException('No puedes borrar este comentario')
     }
