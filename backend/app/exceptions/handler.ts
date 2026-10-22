@@ -1,5 +1,7 @@
 import app from '@adonisjs/core/services/app'
 import { type HttpContext, ExceptionHandler } from '@adonisjs/core/http'
+import AccionNoPermitidaException from '#exceptions/accion_no_permitida_exception'
+import RecursoNoEncontradoException from '#exceptions/recurso_no_encontrado_exception'
 
 export default class HttpExceptionHandler extends ExceptionHandler {
   /**
@@ -13,6 +15,10 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * response to the client
    */
   async handle(error: unknown, ctx: HttpContext) {
+    if (error instanceof RecursoNoEncontradoException || error instanceof AccionNoPermitidaException) {
+      return ctx.response.status(error.status).send({ error: error.message })
+    }
+
     return super.handle(error, ctx)
   }
 
@@ -23,6 +29,11 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * @note You should not attempt to send a response from this method.
    */
   async report(error: unknown, ctx: HttpContext) {
+    // Son respuestas previstas del contrato, no fallos: antes no se registraban.
+    if (error instanceof RecursoNoEncontradoException || error instanceof AccionNoPermitidaException) {
+      return
+    }
+
     return super.report(error, ctx)
   }
 }

@@ -77,8 +77,8 @@ export class ComentarioSchema extends BaseModel {
   declare autorEmail: string
   @column()
   declare autorNombre: string
-  @column.dateTime()
-  declare creadoEn: DateTime | null
+  @column()
+  declare creadoEn: string | null
   @column()
   declare cuerpo: string
   @column()
